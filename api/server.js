@@ -1,6 +1,13 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import swaggerUi from 'swagger-ui-express';
+import cors from 'cors';
 import dotenv from 'dotenv';
+// routes
+import userRouter from './routes/user.route.js';
+import authRouter from './routes/auth.route.js';
+
+import configureSwagger from './swagger.js';
 
 // load environment variables from .env file
 dotenv.config();
@@ -19,10 +26,15 @@ const connectDB = async () => {
 
 // create an express app
 const app = express();
+app.use(express.json());
+app.use(cors());
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+// Configure Swagger
+configureSwagger(app);
+
+// routes
+app.use('/api/users', userRouter);
+app.use('/api/auth', authRouter);
 
 // start the server and connect to the database
 const startServer = async () => {
@@ -31,6 +43,7 @@ const startServer = async () => {
   const PORT = process.env.PORT || 5500;
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+    console.log('Swagger docs are available at http://localhost:5500/api-docs');
   });
 };
 

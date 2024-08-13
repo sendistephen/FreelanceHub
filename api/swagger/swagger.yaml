@@ -1,0 +1,134 @@
+openapi: 3.0.0
+info:
+  title: FreelanceHub API
+  version: 1.0.0
+  description: API documentation for FreelanceHub, a Fiverr clone
+servers:
+  - url: http://localhost:5500/api
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+                - country
+              properties:
+                username:
+                  type: string
+                  description: The user's username
+                  example: Stephen
+                email:
+                  type: string
+                  description: The user's email address
+                  example: stephen@gmail.com
+                password:
+                  type: string
+                  description: The user's password
+                  example: 123456
+                img:
+                  type: string
+                  description: The user's profile image URL
+                  example: https://i.pinimg.com/originals/b4/d5/c4/b4d5c4d3d4e3e4e3e4e3e4e3e4e3e4e3e4e3e4e3e4d5c4b4.jpg
+                country:
+                  type: string
+                  description: The user's country
+                  example: USA
+                phone:
+                  type: string
+                  description: The user's phone number
+                  example: 1234567890
+                desc:
+                  type: string
+                  description: A brief description about the user
+                  example: I am a test user
+                isSeller:
+                  type: boolean
+                  description: Whether the user is a seller or not
+                  example: false
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User created successfully
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  /auth/login:
+    post:
+      summary: Login a user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  description: The user's email address
+                  example: stephen@gmail.com
+                password:
+                  type: string
+                  description: The user's password
+                  example: 123456
+      responses:
+        '200':
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User logged in successfully
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /auth/logout:
+    post:
+      summary: Logout a user
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: User logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User logged out successfully
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
