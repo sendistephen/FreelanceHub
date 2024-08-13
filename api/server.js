@@ -1,6 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import swaggerUi from 'swagger-ui-express';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 // routes
@@ -27,6 +27,7 @@ const connectDB = async () => {
 // create an express app
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
 
 // Configure Swagger

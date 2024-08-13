@@ -1,5 +1,6 @@
 import User from '../models/user.model.js';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 /**
  * @description Registers a new user in the system. The user's password is hashed before saving.
@@ -41,10 +42,31 @@ export const register = async (req, res) => {
   }
 };
 
+/**
+ * @description Logs in a user with their username/email and password. If the login is successful, the user's information is returned in the response.
+ * @route POST /auth/login
+ * @access Public
+ *
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - The request body containing login credentials
+ * @param {string} [req.body.email] - The user's email address
+ * @param {string} [req.body.username] - The user's username
+ * @param {string} req.body.password - The user's password
+ *
+ * @returns {Object} - Returns the user's information in the response
+ */
 export const login = async (req, res) => {
   try {
-    // Find the user by email
-    const user = await User.findOne({ email: req.body.email });
+    const { email, username, password } = req.body;
+
+    // Ensure email or username is provided
+    if (!email && !username)
+      return res.status(400).json({ message: 'Email or username is required' });
+
+    // Find the user by email or username
+    const user = await User.findOne({
+      $or: [{ email }, { username }],
+    });
 
     // If the user is not found, return a 404 error
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -56,12 +78,30 @@ export const login = async (req, res) => {
     if (!isMatch)
       return res.status(401).json({ message: 'Invalid credentials' });
 
-    // Remove the password from the response and return the user
-    const { password, ...info } = user._doc;
+    // Generate a JWT token for the user
+    const token = jwt.sign(
+      {
+        id: user._id,
+        isSeller: user.isSeller,
+      },
+      process.env.JWT_KEY,
+      { expiresIn: '1h' }
+    );
 
-    // Return a 200 status code and the user's information
-    return res.status(200).json(info);
+    // Remove the password from the response and return the user
+    const { password: _, ...info } = user._doc;
+
+    // Set the access token cookie and return the user's information
+    res
+      .cookie('accessToken', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        sameSite: 'strict', // Prevent CSRF attacks
+      })
+      .status(200)
+      .json(info);
   } catch (error) {
+    console.error('Error during user login:', error);
     res.status(500).json({ message: 'Something went wrong' });
   }
 };

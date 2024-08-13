@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
-const { schema } = mongoose;
+const { Schema } = mongoose;
 
-const userSchema = new schema(
+const userSchema = new Schema(
   {
     username: {
       type: String,
