@@ -20,14 +20,15 @@ import jwt from 'jsonwebtoken';
  *
  * @returns {void} - Sends a JSON response with a status message
  */
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
   try {
+    const { password, ...rest } = req.body;
     // Hash the user's password before saving to the database
-    const hash = bcrypt.hashSync(req.body.password, 12);
+    const hash = bcrypt.hashSync(password, 12);
 
     // Create a new user object, spreading the request body and replacing the password with the hashed password
     const newUser = new User({
-      ...req.body,
+      ...rest,
       password: hash,
     });
 
@@ -37,8 +38,7 @@ export const register = async (req, res) => {
     // Respond with a success message if the user is created successfully
     res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
-    console.error('Error during user registration:', error);
-    res.status(500).json({ message: 'Something went wrong' });
+    next(error);
   }
 };
 
@@ -55,7 +55,7 @@ export const register = async (req, res) => {
  *
  * @returns {Object} - Returns the user's information in the response
  */
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   try {
     const { email, username, password } = req.body;
 
@@ -72,7 +72,7 @@ export const login = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     // Compare the user's password with the hashed password
-    const isMatch = await bcrypt.compareSync(req.body.password, user.password);
+    const isMatch = await bcrypt.compareSync(password, user.password);
 
     // If the password does not match, return a 401 error
     if (!isMatch)
@@ -101,8 +101,7 @@ export const login = async (req, res) => {
       .status(200)
       .json(info);
   } catch (error) {
-    console.error('Error during user login:', error);
-    res.status(500).json({ message: 'Something went wrong' });
+    next(error);
   }
 };
 

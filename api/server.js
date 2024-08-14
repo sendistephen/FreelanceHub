@@ -8,6 +8,7 @@ import userRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js';
 
 import configureSwagger from './swagger.js';
+import errorHandler from './middleware/errorHandler.js';
 
 // load environment variables from .env file
 dotenv.config();
@@ -36,6 +37,9 @@ configureSwagger(app);
 // routes
 app.use('/api/users', userRouter);
 app.use('/api/auth', authRouter);
+
+// middleware
+app.use(errorHandler);
 
 // start the server and connect to the database
 const startServer = async () => {
