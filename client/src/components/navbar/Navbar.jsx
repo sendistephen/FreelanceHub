@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import './Navbar.scss';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { userStore } from '../../store/userStore';
+import apiClient from '../../utils/apiClient';
 
 const Navbar = () => {
   const [active, setActive] = useState(false);
   const [open, setOpen] = useState(false);
 
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  const currentUser = userStore((state) => state.user);
+  const clearUser = userStore((state) => state.clearUser);
 
   const isActive = () => {
     window.scrollY > 0 ? setActive(true) : setActive(false);
@@ -18,13 +24,16 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', isActive);
   }, []);
 
-  const currentUser = {
-    id: 1,
-    username: 'Stephen',
-    img: 'https://avatars.githubusercontent.com/u/100200821?s=400&u=c3e9d3f0e0c6b4b2b1e6d9c1c2f3a4b5&v=4',
-    isSeller: true,
+  const handleLogout = async () => {
+    try {
+      // delete user cookie
+      await apiClient.post('/auth/logout');
+      clearUser();
+      navigate('/');
+    } catch (error) {
+      console.log(error);
+    }
   };
-
   return (
     <div className={active || pathname !== '/' ? 'navbar active' : 'navbar'}>
       <div className="container">
@@ -39,12 +48,14 @@ const Navbar = () => {
           <span>Business</span>
           <span>Explore</span>
           <span>English</span>
-          <span>Signin</span>
+          <Link to="/login" className="link">
+            Signin
+          </Link>
           {!currentUser?.isSeller && <span>Become a seller</span>}
           {!currentUser?.isSeller && <button>Join</button>}
           {currentUser && (
             <div className="user" onClick={() => setOpen(!open)}>
-              <img src={currentUser.img} alt="user" />
+              <img src={currentUser.img ?? './noAvatar.jpeg'} alt="user" />
               <span>{currentUser.username}</span>
               {open && (
                 <div className="options">
@@ -64,7 +75,9 @@ const Navbar = () => {
                   <Link to="/orders" className="link">
                     Orders
                   </Link>
-                  <span>Logout</span>
+                  <Link className="link" onClick={handleLogout}>
+                    Logout
+                  </Link>
                 </div>
               )}
             </div>
