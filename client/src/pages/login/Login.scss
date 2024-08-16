@@ -31,6 +31,10 @@
       font-size: 18px;
       background-color: #bf1d76;
       cursor: pointer;
+
+      &:hover {
+        background-color: #a41b66;
+      }
     }
     span {
       color: red;

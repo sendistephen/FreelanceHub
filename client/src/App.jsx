@@ -12,6 +12,7 @@ import Messages from './pages/messages/Messages';
 import Message from './pages/message/Message';
 import './App.scss';
 import Login from './pages/login/Login';
+import Register from './pages/register/Register';
 
 const Layout = () => {
   return (
@@ -62,6 +63,10 @@ const router = createBrowserRouter([
       {
         path: '/login',
         element: <Login />,
+      },
+      {
+        path: '/register',
+        element: <Register />,
       },
     ],
   },
