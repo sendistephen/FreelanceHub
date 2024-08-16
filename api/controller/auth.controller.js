@@ -1,6 +1,7 @@
 import User from '../models/user.model.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { AppError, NotFoundError } from '../utils/customErrors.js';
 
 /**
  * @description Registers a new user in the system. The user's password is hashed before saving.
@@ -61,7 +62,7 @@ export const login = async (req, res, next) => {
 
     // Ensure email or username is provided
     if (!email && !username)
-      return res.status(400).json({ message: 'Email or username is required' });
+      throw new AppError('Email or username is required');
 
     // Find the user by email or username
     const user = await User.findOne({
@@ -69,14 +70,13 @@ export const login = async (req, res, next) => {
     });
 
     // If the user is not found, return a 404 error
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) throw new NotFoundError('User not found');
 
     // Compare the user's password with the hashed password
     const isMatch = await bcrypt.compareSync(password, user.password);
 
     // If the password does not match, return a 401 error
-    if (!isMatch)
-      return res.status(401).json({ message: 'Invalid credentials' });
+    if (!isMatch) throw new AppError('Invalid credentials', 401);
 
     // Generate a JWT token for the user
     const token = jwt.sign(
@@ -105,4 +105,9 @@ export const login = async (req, res, next) => {
   }
 };
 
-export const logout = (req, res) => {};
+export const logout = (req, res) => {
+  res.clearCookie('accessToken', {
+    sameSite: 'none',
+    secure: true,
+  }).status(200).send('Logged out successfully');
+};
