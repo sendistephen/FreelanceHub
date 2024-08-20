@@ -1,5 +1,10 @@
+import mongoose from 'mongoose';
 import Gig from '../models/gig.model.js';
-import { AppError, NotFoundError } from '../utils/customErrors.js';
+import {
+  AppError,
+  NotFoundError,
+  UnauthorizedError,
+} from '../utils/customErrors.js';
 
 /**
  * @function createGig
@@ -46,17 +51,38 @@ export const createGig = async (req, res, next) => {
     const saveGig = await newGig.save();
     return res.status(201).json({
       message: 'Gig created successfully',
-      gig: saveGig,
+      data: saveGig,
     });
   } catch (error) {
     return next(error);
   }
 };
 
+/**
+ * @function getGigs
+ * @description Retrieves all gigs from the database. If no gigs are found, returns an empty array with a message.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>} Sends a JSON response with the list of gigs or an error
+ */
+
 export const getGigs = async (req, res, next) => {
   try {
+    // fetch all gigs from the database
     const gigs = await Gig.find();
-    return res.status(200).json(gigs);
+    if (gigs.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No gigs found',
+        data: [],
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: 'Gigs retrieved successfully',
+      data: gigs,
+    });
   } catch (error) {
     return next(error);
   }
@@ -64,6 +90,40 @@ export const getGigs = async (req, res, next) => {
 export const getGig = async (req, res, next) => {
   console.log(req.params.id);
 };
+
+/**
+ * @function deleteGig
+ * @description Handles the deletion of a gig by its ID. Only the owner of the gig can delete it.
+ * @param {Object} req - Express request object
+ * @param {string} req.params.id - The ID of the gig to be deleted
+ * @param {string} req.userId - The ID of the authenticated user
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>} Sends a JSON response indicating success or failure
+ */
 export const deleteGig = async (req, res, next) => {
-  console.log(req.params.id);
+  try {
+    // validate object id format
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new AppError('Invalid gig ID', 400));
+    }
+    // find the gig by id
+    const gig = await Gig.findById(req.params.id);
+
+    if (!gig) {
+      return next(new NotFoundError('Gig not found'));
+    }
+    // check if gig belongs to the owner
+    if (gig.userId !== req.userId) {
+      return next(new UnauthorizedError('You can delete only your own gig!'));
+    }
+    // delete the gig
+    await Gig.findByIdAndDelete(req.params.id);
+
+    return res.status(200).json({
+      message: 'Gig deleted successfully',
+    });
+  } catch (error) {
+    return next(error);
+  }
 };
