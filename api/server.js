@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 // routes
 import userRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js';
+import gigRouter from './routes/gig.route.js';
 
 import configureSwagger from './swagger.js';
 import errorHandler from './middleware/errorHandler.js';
@@ -37,6 +38,7 @@ configureSwagger(app);
 // routes
 app.use('/api/users', userRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/gigs', gigRouter);
 
 // middleware
 app.use(errorHandler);
