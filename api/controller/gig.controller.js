@@ -5,6 +5,7 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from '../utils/customErrors.js';
+import { gigQueryBuilder } from '../utils/gigQueryBuilder.js';
 
 /**
  * @function createGig
@@ -69,8 +70,9 @@ export const createGig = async (req, res, next) => {
 
 export const getGigs = async (req, res, next) => {
   try {
+    const query = gigQueryBuilder(req.query);
     // fetch all gigs from the database
-    const gigs = await Gig.find();
+    const gigs = await Gig.find(query);
     if (gigs.length === 0) {
       return res.status(200).json({
         success: true,
@@ -88,7 +90,26 @@ export const getGigs = async (req, res, next) => {
   }
 };
 export const getGig = async (req, res, next) => {
-  console.log(req.params.id);
+  try {
+    // validate object id format
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new AppError('Invalid gig ID', 400));
+    }
+    // find the gig by id
+    const gig = await Gig.findById(req.params.id);
+
+    if (!gig) {
+      return next(new NotFoundError('Gig not found'));
+    }
+    // Return the gig
+    return res.status(200).json({
+      success: true,
+      message: 'Gig retrieved successfully',
+      data: gig,
+    });
+  } catch (error) {
+    return next(error);
+  }
 };
 
 /**

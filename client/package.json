@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.52.0",
     "axios": "^1.7.4",
     "infinite-react-carousel": "^1.2.11",
     "lucide-react": "^0.424.0",
