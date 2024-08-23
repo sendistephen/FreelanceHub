@@ -10,9 +10,9 @@
  * @returns {Object} A query object that can be used to filter gigs
  * return query
  */
-export const gigQueryBuilder = (filters) => {
-  const query = {};
-  const sort = {};
+export const gigQueryBuilder = (filters: GigFilters): GigQuery => {
+  const query: Record<string, any> = {};
+  const sort: Record<string, 1 | -1> = {};
 
   if (filters.cat) {
     query.cat = filters.cat;
@@ -21,10 +21,10 @@ export const gigQueryBuilder = (filters) => {
   if (filters.min || filters.max) {
     query.price = {};
     if (filters.min) {
-      query.price.$gte = parseFloat(filters.min); 
+      query.price.$gte = parseFloat(filters.min);
     }
     if (filters.max) {
-      query.price.$lte = parseFloat(filters.max); 
+      query.price.$lte = parseFloat(filters.max);
     }
   }
 

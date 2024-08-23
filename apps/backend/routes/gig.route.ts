@@ -1,11 +1,11 @@
 import express from 'express';
-import { verifyToken } from '../middleware/jwt.js';
+import { verifyToken } from '../middleware/jwt';
 import {
   createGig,
   deleteGig,
   getGig,
   getGigs,
-} from '../controller/gig.controller.js';
+} from '../controller/gig.controller';
 
 const router = express.Router();
 

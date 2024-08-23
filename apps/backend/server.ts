@@ -4,12 +4,12 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 // routes
-import userRouter from './routes/user.route.js';
-import authRouter from './routes/auth.route.js';
-import gigRouter from './routes/gig.route.js';
+import userRouter from './routes/user.route';
+import authRouter from './routes/auth.route';
+import gigRouter from './routes/gig.route';
 
-import configureSwagger from './swagger.js';
-import errorHandler from './middleware/errorHandler.js';
+import configureSwagger from './swagger';
+import errorHandler from './middleware/errorHandler';
 
 // load environment variables from .env file
 dotenv.config();
@@ -48,10 +48,29 @@ const startServer = async () => {
   await connectDB();
 
   const PORT = process.env.PORT || 5500;
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     console.log('Swagger docs are available at http://localhost:5500/api-docs');
   });
+
+  // Graceful shutdown
+  const gracefulShutdown = async () => {
+    console.log('SIGTERM signal received: closing HTTP server');
+    server.close(async () => {
+      console.log('HTTP server closed');
+      try {
+        await mongoose.connection.close(false);
+        console.log('MongoDB connection closed');
+        process.exit(0);
+      } catch (err) {
+        console.error('Error during MongoDB disconnection', err);
+        process.exit(1);
+      }
+    });
+  };
+
+  process.on('SIGTERM', gracefulShutdown);
+  process.on('SIGINT', gracefulShutdown);
 };
 
 startServer();

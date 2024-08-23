@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
-import User from '../models/user.model.js';
-import { AppError, NotFoundError, UnauthorizedError } from '../utils/customErrors.js';
+import express from 'express';
+import User from '@/models/user.model';
+import { AppError, NotFoundError, UnauthorizedError } from '@/utils/customErrors';
 
-export const deleteUser = async (req, res, next) => {
+export const deleteUser = async (req:express.Request, res:express.Response, next:express.NextFunction):Promise<express.Response | void> => {
   try {
     // Get user fromt the database
     const user = await User.findById(req.params.id);
@@ -23,7 +24,7 @@ export const deleteUser = async (req, res, next) => {
   }
 };
 
-export const getUser = async (req, res, next) =>{
+export const getUser = async (req:express.Request, res:express.Response, next:express.NextFunction):Promise<express.Response | void> =>{
   try {
     // validate mongoose ObjectId
     if (!mongoose.isValidObjectId(req.params.id)) {

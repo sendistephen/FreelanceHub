@@ -1,11 +1,12 @@
 import mongoose from 'mongoose';
-import Gig from '../models/gig.model.js';
+import express from 'express';
+import Gig from '../models/gig.model';
 import {
   AppError,
   NotFoundError,
   UnauthorizedError,
-} from '../utils/customErrors.js';
-import { gigQueryBuilder } from '../utils/gigQueryBuilder.js';
+} from '../utils/customErrors';
+import { gigQueryBuilder } from '../utils/gigQueryBuilder';
 
 /**
  * @function createGig
@@ -30,7 +31,15 @@ import { gigQueryBuilder } from '../utils/gigQueryBuilder.js';
  * @returns {Promise<void>} Sends a JSON response with the created gig or an error
  * @throws {AppError} If the user is not a seller or not authenticated
  */
-export const createGig = async (req, res, next) => {
+export const createGig = async (
+  req: express.Request<
+    {},
+    {},
+    CreateGigRequest & { isSeller: boolean; userId: string }
+  >,
+  res: express.Response,
+  next: express.NextFunction
+): Promise<express.Response | void> => {
   //  Check if user is a seller or not
   if (!req.isSeller) {
     return next(new AppError('Only sellers can create gigs', 403));
@@ -42,9 +51,11 @@ export const createGig = async (req, res, next) => {
   }
 
   //  create a gig object
+  const { userId: _, ...gigData } = req.body;
+
   const newGig = new Gig({
     userId: req.userId,
-    ...req.body,
+    ...gigData,
   });
 
   try {
@@ -68,9 +79,13 @@ export const createGig = async (req, res, next) => {
  * @returns {Promise<void>} Sends a JSON response with the list of gigs or an error
  */
 
-export const getGigs = async (req, res, next) => {
+export const getGigs = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+): Promise<express.Response | void> => {
   try {
-    const {query,sort} = gigQueryBuilder(req.query);
+    const { query, sort } = gigQueryBuilder(req.query);
     // fetch all gigs from the database
     const gigs = await Gig.find(query).sort(sort);
     if (gigs.length === 0) {
@@ -89,10 +104,15 @@ export const getGigs = async (req, res, next) => {
     return next(error);
   }
 };
-export const getGig = async (req, res, next) => {
+export const getGig = async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<express.Response | void> => {
   try {
+    const {id } = req.params;
+
+    if(!id){
+      return next(new AppError('Invalid gig ID', 400));
+    }
     // validate object id format
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return next(new AppError('Invalid gig ID', 400));
     }
     // find the gig by id
@@ -122,10 +142,15 @@ export const getGig = async (req, res, next) => {
  * @param {Function} next - Express next middleware function
  * @returns {Promise<void>} Sends a JSON response indicating success or failure
  */
-export const deleteGig = async (req, res, next) => {
+export const deleteGig = async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<express.Response | void> => {
   try {
+    const {id } = req.params;
+
+    if(!id){
+      return next(new AppError('Invalid gig ID', 400));
+    }
     // validate object id format
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return next(new AppError('Invalid gig ID', 400));
     }
     // find the gig by id

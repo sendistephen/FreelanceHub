@@ -1,7 +1,8 @@
-import User from '../models/user.model.js';
+import User from '@/models/user.model';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { AppError, NotFoundError } from '../utils/customErrors.js';
+import { AppError, NotFoundError } from '@/utils/customErrors';
+import express from 'express';
 
 /**
  * @description Registers a new user in the system. The user's password is hashed before saving.
@@ -21,7 +22,11 @@ import { AppError, NotFoundError } from '../utils/customErrors.js';
  *
  * @returns {void} - Sends a JSON response with a status message
  */
-export const register = async (req, res, next) => {
+export const register = async (
+  req: express.Request<{}, {}, Register>,
+  res: express.Response,
+  next: express.NextFunction
+): Promise<void> => {
   try {
     const { password, ...rest } = req.body;
     // Hash the user's password before saving to the database
@@ -56,24 +61,28 @@ export const register = async (req, res, next) => {
  *
  * @returns {Object} - Returns the user's information in the response
  */
-export const login = async (req, res, next) => {
+export const login = async (
+  req: express.Request<{}, {}, Login>,
+  res: express.Response,
+  next: express.NextFunction
+): Promise<void> => {
   try {
     const { email, username, password } = req.body;
 
     // Ensure email or username is provided
     if (!email && !username)
-      throw new AppError('Email or username is required');
+      throw new AppError('Email or username is required', 400);
 
     // Find the user by email or username
     const user = await User.findOne({
       $or: [{ email }, { username }],
-    });
+    }).lean();
 
     // If the user is not found, return a 404 error
     if (!user) throw new NotFoundError('User not found');
 
     // Compare the user's password with the hashed password
-    const isMatch = await bcrypt.compareSync(password, user.password);
+    const isMatch = bcrypt.compareSync(password, user.password);
 
     // If the password does not match, return a 401 error
     if (!isMatch) throw new AppError('Invalid credentials', 401);
@@ -84,12 +93,12 @@ export const login = async (req, res, next) => {
         id: user._id,
         isSeller: user.isSeller,
       },
-      process.env.JWT_KEY,
+      process.env.JWT_KEY as string,
       { expiresIn: '1d' }
     );
 
     // Remove the password from the response and return the user
-    const { password: _, ...info } = user._doc;
+    const { password: _, ...info } = user;
 
     // Set the access token cookie and return the user's information
     res
@@ -105,9 +114,12 @@ export const login = async (req, res, next) => {
   }
 };
 
-export const logout = (req, res) => {
-  res.clearCookie('accessToken', {
-    sameSite: 'none',
-    secure: true,
-  }).status(200).send('Logged out successfully');
+export const logout = (req: express.Request, res: express.Response): void => {
+  res
+    .clearCookie('accessToken', {
+      sameSite: 'none',
+      secure: true,
+    })
+    .status(200)
+    .send('Logged out successfully');
 };

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 const { Schema } = mongoose;
 
 const GigSchema = new Schema(
@@ -39,10 +39,6 @@ const GigSchema = new Schema(
       type: [String],
       required: false,
     },
-    userId: {
-      type: String,
-      required: true,
-    },
     shortTitle: {
       type: String,
       required: true,
@@ -73,4 +69,4 @@ const GigSchema = new Schema(
   }
 );
 
-export default mongoose.model('Gig', GigSchema);
+export default mongoose.model<IGig & Document>('Gig', GigSchema);

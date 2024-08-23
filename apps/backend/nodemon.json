@@ -1,0 +1,6 @@
+{
+  "watch": ["*.ts", "controllers/", "models/", "routes/", "middleware/"],
+  "ext": "ts",
+  "ignore": ["dist/*", "node_modules/*"],
+  "exec": "ts-node-dev --respawn --transpile-only --require tsconfig-paths/register server.ts"
+}
