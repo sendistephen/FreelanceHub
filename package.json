@@ -1,13 +1,14 @@
 {
-  "name": "FreelanceHub",
+  "name": "freelancehub",
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
+    "dev": "concurrently \"yarn workspace backend run dev\" \"yarn workspace frontend run dev\"",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "prettier": "^3.2.5",
     "turbo": "^2.0.14",
     "typescript": "^5.4.5"
