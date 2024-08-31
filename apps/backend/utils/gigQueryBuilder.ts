@@ -11,8 +11,8 @@
  * return query
  */
 export const gigQueryBuilder = (filters: GigFilters): GigQuery => {
-  const query: Record<string, any> = {};
-  const sort: Record<string, 1 | -1> = {};
+  const query: GigQuery['query'] = {};
+  const sort: GigQuery['sort'] = {};
 
   if (filters.cat) {
     query.cat = filters.cat;

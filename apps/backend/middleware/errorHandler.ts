@@ -1,6 +1,10 @@
-import express from "express";
+import express from 'express';
 
-const errorHandler = (err:any, req:express.Request, res:express.Response, next:express.NextFunction):void => {
+interface CustomError extends Error {
+  statusCode?: number;
+}
+
+const errorHandler = (err: CustomError, req: express.Request, res: express.Response): void => {
   // Log the error stack in development for debugging purposes
   if (process.env.NODE_ENV === 'development') {
     console.error('Error stack: ', err.stack);
@@ -9,10 +13,10 @@ const errorHandler = (err:any, req:express.Request, res:express.Response, next:e
   const statusCode = err.statusCode || 500;
 
   //   construct the response object
-  const response:{
-    success:boolean;
-    message:string;
-    stack?:string;
+  const response: {
+    success: boolean;
+    message: string;
+    stack?: string;
   } = {
     success: false,
     message: err.message || 'Internal Server Error',

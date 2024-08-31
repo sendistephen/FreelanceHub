@@ -34,12 +34,16 @@
     }
 
     p {
-      color: #111;
+      color:#404145;
+      line-height: 24px;
+      font-size: 16px;
+      font-weight: 400;
       overflow: hidden;
       display:-webkit-box;
       line-clamp: 2;
       -webkit-line-clamp: 2; /* Limit to 2 lines */
       -webkit-box-orient: vertical;
+
     }
 
     .star {
@@ -55,7 +59,7 @@
       span {
         font-size: 14px;
         font-weight: bold;
-        color: #ffc108;
+        color: #010101;
       }
     }
   }
@@ -85,9 +89,10 @@
       }
 
       h2 {
-        color: #555;
+        color: #010101;
+        font-size: 12px;
+        font-weight: bold;
         font-size: 18px;
-        font-weight: 400;
         text-align: end;
       }
 

@@ -1,6 +1,7 @@
 {
   "name": "freelancehub",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "turbo build",
     "dev": "concurrently \"yarn workspace backend run dev\" \"yarn workspace frontend run dev\"",

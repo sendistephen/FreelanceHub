@@ -33,8 +33,8 @@ import { gigQueryBuilder } from '../utils/gigQueryBuilder';
  */
 export const createGig = async (
   req: express.Request<
-    {},
-    {},
+    object,
+    object,
     CreateGigRequest & { isSeller: boolean; userId: string }
   >,
   res: express.Response,
@@ -49,9 +49,10 @@ export const createGig = async (
   if (!req.userId) {
     return next(new AppError('You are not authenticated', 401));
   }
-
+                                               
   //  create a gig object
-  const { userId: _, ...gigData } = req.body;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { userId: _, ...gigData } = req.body; 
 
   const newGig = new Gig({
     userId: req.userId,

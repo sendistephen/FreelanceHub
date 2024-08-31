@@ -19,7 +19,6 @@ export const deleteUser = async (req:express.Request, res:express.Response, next
     await User.findByIdAndDelete(req.params.id);
     return res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
-    console.error('Error in deleteUser controller:', error);
     next(error);
   }
 };

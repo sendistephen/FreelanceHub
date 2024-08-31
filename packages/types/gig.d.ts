@@ -41,8 +41,21 @@ interface IGigsQuery{
 }
 
 interface GigQuery {
-  query: Record<string, any>;
-  sort: Record<string, 1 | -1>;
+  query: {
+    cat?: string;
+    price?: {
+      $gte?: number;
+      $lte?: number;
+    };
+    title?: {
+      $regex?: string;
+      $options?: string;
+    };
+  }
+  sort: {
+    createdAt?: 1 | -1;
+    sales?: 1 | -1;
+  }
 }
 
 interface GigFilters {

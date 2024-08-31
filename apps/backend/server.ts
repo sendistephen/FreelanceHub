@@ -19,8 +19,10 @@ const connectDB = async () => {
   try {
     const mongoURI = process.env.MONGODB_URI || '';
     await mongoose.connect(mongoURI);
+    // eslint-disable-next-line no-console
     console.log('MongoDB connected successfully');
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('MongoDB connection error: ', error);
     process.exit(1);
   }
